@@ -1,0 +1,10 @@
+﻿Table Drop:
+DROP TABLE IF EXISTS "HotelExperiences";
+
+DROP TABLE IF EXISTS "Reservations";
+
+DROP TABLE IF EXISTS "UserPreferences";
+DROP TABLE IF EXISTS "Hotels";
+DROP TABLE IF EXISTS "Experiences";
+DROP TABLE IF EXISTS "Users";
+DROP TABLE IF EXISTS "__EFMigrationsHistory";

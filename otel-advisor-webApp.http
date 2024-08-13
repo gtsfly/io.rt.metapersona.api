@@ -1,0 +1,6 @@
+@otel_advisor_webApp_HostAddress = http://localhost:5050
+
+GET {{otel_advisor_webApp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
