@@ -6,6 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using otel_advisor_webApp.Data;
+using otel_advisor_webApp.Interfaces;
+using otel_advisor_webApp.Services;
+using System.Net.Mail;
+using System.Net;
 
 public class Startup
 {
@@ -25,6 +29,8 @@ public class Startup
                                   .AllowAnyMethod()
                                   .AllowAnyHeader());
         });
+
+        services.AddScoped<ReservationConfirmedService>();
 
         services.AddControllers();
 
@@ -48,6 +54,16 @@ public class Startup
                            .AllowAnyHeader();
                 });
         });
+
+        var emailConfig = Configuration.GetSection("EmailSettings");
+        services.AddSingleton(new SmtpClient(emailConfig["SmtpServer"])
+        {
+            Port = int.Parse(emailConfig["SmtpPort"]),
+            Credentials = new NetworkCredential(emailConfig["SmtpUser"], emailConfig["SmtpPass"]),
+            EnableSsl = true
+        });
+
+        services.AddTransient<IEmailService, EmailService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -68,12 +84,12 @@ public class Startup
 
         app.UseAuthorization();
 
-        // Swagger middleware'ini ekleyin
+        // Swagger middleware
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            c.RoutePrefix = string.Empty; // Swagger'ı kök dizinde çalıştırmak için
+            c.RoutePrefix = string.Empty; 
         });
 
         app.UseEndpoints(endpoints =>

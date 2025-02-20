@@ -12,15 +12,15 @@ using otel_advisor_webApp.Data;
 namespace otel_advisor_webApp.Migrations
 {
     [DbContext(typeof(HotelContext))]
-    [Migration("20240813124516_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240919113210_boardTypeAddedToInfResevationOffer")]
+    partial class boardTypeAddedToInfResevationOffer
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -106,16 +106,111 @@ namespace otel_advisor_webApp.Migrations
                     b.ToTable("ref_location", (string)null);
                 });
 
-            modelBuilder.Entity("otel_advisor_webApp.Models.Reservation", b =>
+            modelBuilder.Entity("otel_advisor_webApp.Models.ReservationConfirmed", b =>
                 {
-                    b.Property<int>("reservation_id")
+                    b.Property<int>("confirmed_reservation_id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("reservation_id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("confirmed_reservation_id"));
+
+                    b.Property<DateTime>("check_in_date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("check_out_date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("confirm_date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("hotel_id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("price")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("reservation_request_id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("room_type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("user_id")
+                        .HasColumnType("integer");
+
+                    b.HasKey("confirmed_reservation_id");
+
+                    b.HasIndex("hotel_id");
+
+                    b.HasIndex("reservation_request_id");
+
+                    b.HasIndex("user_id");
+
+                    b.ToTable("inf_reservation_confirmed", (string)null);
+                });
+
+            modelBuilder.Entity("otel_advisor_webApp.Models.ReservationOffer", b =>
+                {
+                    b.Property<string>("offer_key")
+                        .HasColumnType("text");
+
+                    b.Property<string>("board_type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("check_in_date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("check_out_date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("hotel_id")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("price")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("room_type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("offer_key");
+
+                    b.HasIndex("hotel_id");
+
+                    b.ToTable("inf_reservation_offer", (string)null);
+                });
+
+            modelBuilder.Entity("otel_advisor_webApp.Models.ReservationRequest", b =>
+                {
+                    b.Property<int>("reservation_request_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("reservation_request_id"));
+
+                    b.Property<int>("adult_num")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("budget")
                         .HasColumnType("numeric");
+
+                    b.Property<DateTime>("check_in_range_end")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("check_in_range_start")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("child_num")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("children_ages")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime>("created_at")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("exp_1")
                         .IsRequired()
@@ -148,16 +243,10 @@ namespace otel_advisor_webApp.Migrations
                     b.Property<int>("stay_duration")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("trip_end")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("trip_start")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("user_id")
                         .HasColumnType("integer");
 
-                    b.HasKey("reservation_id");
+                    b.HasKey("reservation_request_id");
 
                     b.HasIndex("hotel_id");
 
@@ -185,6 +274,77 @@ namespace otel_advisor_webApp.Migrations
                     b.HasKey("user_id");
 
                     b.ToTable("def_user", (string)null);
+                });
+
+            modelBuilder.Entity("otel_advisor_webApp.Models.UserHotelExperience", b =>
+                {
+                    b.Property<int>("user_hotel_experience_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("user_hotel_experience_id"));
+
+                    b.Property<string>("additional_comments")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("experience_1")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("experience_1_rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("experience_2")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("experience_2_rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("experience_3")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("experience_3_rating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("hotel_id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("least_liked_experience")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("most_liked_experience")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("overall_rating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("reservation_request_id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("user_id")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("would_visit_again")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("user_hotel_experience_id");
+
+                    b.HasIndex("hotel_id");
+
+                    b.HasIndex("reservation_request_id");
+
+                    b.HasIndex("user_id");
+
+                    b.ToTable("inf_user_hotel_experience", (string)null);
                 });
 
             modelBuilder.Entity("otel_advisor_webApp.Models.UserPreference", b =>
@@ -243,19 +403,80 @@ namespace otel_advisor_webApp.Migrations
                     b.Navigation("hotel");
                 });
 
-            modelBuilder.Entity("otel_advisor_webApp.Models.Reservation", b =>
+            modelBuilder.Entity("otel_advisor_webApp.Models.ReservationConfirmed", b =>
+                {
+                    b.HasOne("otel_advisor_webApp.Models.Hotel", "Hotel")
+                        .WithMany()
+                        .HasForeignKey("hotel_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("otel_advisor_webApp.Models.ReservationRequest", "ReservationRequest")
+                        .WithMany()
+                        .HasForeignKey("reservation_request_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("otel_advisor_webApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("user_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("ReservationRequest");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("otel_advisor_webApp.Models.ReservationOffer", b =>
                 {
                     b.HasOne("otel_advisor_webApp.Models.Hotel", null)
-                        .WithMany("Reservations")
+                        .WithMany("ReservationOffers")
+                        .HasForeignKey("hotel_id");
+                });
+
+            modelBuilder.Entity("otel_advisor_webApp.Models.ReservationRequest", b =>
+                {
+                    b.HasOne("otel_advisor_webApp.Models.Hotel", null)
+                        .WithMany("ReservationRequests")
                         .HasForeignKey("hotel_id");
 
                     b.HasOne("otel_advisor_webApp.Models.User", "user")
-                        .WithMany("Reservations")
+                        .WithMany("ReservationRequests")
                         .HasForeignKey("user_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("otel_advisor_webApp.Models.UserHotelExperience", b =>
+                {
+                    b.HasOne("otel_advisor_webApp.Models.Hotel", "Hotel")
+                        .WithMany()
+                        .HasForeignKey("hotel_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("otel_advisor_webApp.Models.ReservationConfirmed", "ReservationConfirmed")
+                        .WithMany()
+                        .HasForeignKey("reservation_request_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("otel_advisor_webApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("user_id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("ReservationConfirmed");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("otel_advisor_webApp.Models.UserPreference", b =>
@@ -288,7 +509,9 @@ namespace otel_advisor_webApp.Migrations
                 {
                     b.Navigation("HotelExperiences");
 
-                    b.Navigation("Reservations");
+                    b.Navigation("ReservationOffers");
+
+                    b.Navigation("ReservationRequests");
                 });
 
             modelBuilder.Entity("otel_advisor_webApp.Models.Location", b =>
@@ -298,7 +521,7 @@ namespace otel_advisor_webApp.Migrations
 
             modelBuilder.Entity("otel_advisor_webApp.Models.User", b =>
                 {
-                    b.Navigation("Reservations");
+                    b.Navigation("ReservationRequests");
 
                     b.Navigation("UserPreferences");
                 });

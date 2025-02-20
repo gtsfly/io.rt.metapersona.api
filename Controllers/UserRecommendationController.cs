@@ -21,17 +21,17 @@ namespace otel_advisor_webApp.Controllers
             _context = context;
         }
 
-        [HttpPost("recommend/{userId}")]
-        public async Task<ActionResult<IEnumerable<HotelDto>>> GetRecommendedHotels(int userId)
+        [HttpPost("recommend/{reservationRequestId}")]
+        public async Task<ActionResult<IEnumerable<HotelDto>>> GetRecommendedHotels(int reservationRequestId)
         {
-            // Fetch the user's reservation details
+            // Fetch the reservation details using reservation_request_id
             var reservation = await _context.Inf_Reservation
-                                             .Where(r => r.user_id == userId)
+                                             .Where(r => r.reservation_request_id == reservationRequestId)
                                              .FirstOrDefaultAsync();
 
             if (reservation == null)
             {
-                return NotFound("No reservation found for the given user.");
+                return NotFound("No reservation found for the given reservation request.");
             }
 
             // Fetch the experience IDs for the user's selected experiences

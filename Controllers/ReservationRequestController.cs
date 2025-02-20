@@ -27,11 +27,11 @@ namespace otel_advisor_webApp.Controllers
                 .Include(r => r.user) // User details
                 .Select(r => new ReservationRequestDto
                 {
-                    reservation_id = r.reservation_id,
+                    reservation_request_id = r.reservation_request_id,
                     user_id = r.user_id,
                     user_name = r.user != null ? r.user.name : null, // user_name is optional to print on admin panel
-                    trip_start = r.trip_start,
-                    trip_end = r.trip_end,
+                    check_in_range_start = r.check_in_range_start,
+                    check_in_range_end = r.check_in_range_end,
                     budget = r.budget,
                     location = r.location,
                     stay_duration = r.stay_duration,
@@ -40,7 +40,11 @@ namespace otel_advisor_webApp.Controllers
                     exp_2 = r.exp_2,
                     exp_2_rating = r.exp_2_rating,
                     exp_3 = r.exp_3,
-                    exp_3_rating = r.exp_3_rating
+                    exp_3_rating = r.exp_3_rating,
+                    adult_num = r.adult_num,
+                    child_num = r.child_num,
+                    children_ages = r.children_ages, 
+                    created_at = r.created_at 
                 }).ToListAsync();
             return Ok(Inf_Reservation);
         }
@@ -49,15 +53,15 @@ namespace otel_advisor_webApp.Controllers
         public async Task<ActionResult<ReservationRequestDto>> GetReservation(int id)
         {
             var reservation = await _context.Inf_Reservation
-                .Include(r => r.user) 
-                .Where(r => r.reservation_id == id)
+                .Include(r => r.user)
+                .Where(r => r.reservation_request_id == id)
                 .Select(r => new ReservationRequestDto
                 {
-                    reservation_id = r.reservation_id,
+                    reservation_request_id = r.reservation_request_id,
                     user_id = r.user_id,
-                    user_name = r.user != null ? r.user.name : null, 
-                    trip_start = r.trip_start,
-                    trip_end = r.trip_end,
+                    user_name = r.user != null ? r.user.name : null,
+                    check_in_range_start = r.check_in_range_start,
+                    check_in_range_end = r.check_in_range_end,
                     budget = r.budget,
                     location = r.location,
                     stay_duration = r.stay_duration,
@@ -66,7 +70,11 @@ namespace otel_advisor_webApp.Controllers
                     exp_2 = r.exp_2,
                     exp_2_rating = r.exp_2_rating,
                     exp_3 = r.exp_3,
-                    exp_3_rating = r.exp_3_rating
+                    exp_3_rating = r.exp_3_rating,
+                    adult_num = r.adult_num,
+                    child_num = r.child_num,
+                    children_ages = r.children_ages, 
+                    created_at = r.created_at 
                 }).FirstOrDefaultAsync();
 
             if (reservation == null)
@@ -84,8 +92,8 @@ namespace otel_advisor_webApp.Controllers
                 var reservation = new ReservationRequest
                 {
                     user_id = reservationDto.user_id,
-                    trip_start = DateTime.SpecifyKind(reservationDto.trip_start, DateTimeKind.Utc),
-                    trip_end = DateTime.SpecifyKind(reservationDto.trip_end, DateTimeKind.Utc),
+                    check_in_range_start = DateTime.SpecifyKind(reservationDto.check_in_range_start, DateTimeKind.Utc),
+                    check_in_range_end = DateTime.SpecifyKind(reservationDto.check_in_range_end, DateTimeKind.Utc),
                     budget = reservationDto.budget,
                     location = reservationDto.location,
                     stay_duration = reservationDto.stay_duration,
@@ -94,13 +102,20 @@ namespace otel_advisor_webApp.Controllers
                     exp_2 = reservationDto.exp_2,
                     exp_2_rating = reservationDto.exp_2_rating,
                     exp_3 = reservationDto.exp_3,
-                    exp_3_rating = reservationDto.exp_3_rating
+                    exp_3_rating = reservationDto.exp_3_rating,
+                    adult_num = reservationDto.adult_num,
+                    child_num = reservationDto.child_num,
+                    children_ages = reservationDto.children_ages, 
+                    created_at = DateTime.UtcNow 
                 };
 
                 _context.Inf_Reservation.Add(reservation);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetReservation", new { id = reservation.reservation_id }, reservationDto);
+                reservationDto.reservation_request_id = reservation.reservation_request_id;
+                reservationDto.created_at = reservation.created_at; 
+
+                return CreatedAtAction("GetReservation", new { id = reservation.reservation_request_id }, reservationDto);
             }
             catch (Exception ex)
             {
@@ -123,8 +138,8 @@ namespace otel_advisor_webApp.Controllers
             }
 
             reservation.user_id = reservationDto.user_id;
-            reservation.trip_start = reservationDto.trip_start;
-            reservation.trip_end = reservationDto.trip_end;
+            reservation.check_in_range_start = reservationDto.check_in_range_start;
+            reservation.check_in_range_end = reservationDto.check_in_range_end;
             reservation.budget = reservationDto.budget;
             reservation.location = reservationDto.location;
             reservation.stay_duration = reservationDto.stay_duration;
@@ -134,6 +149,10 @@ namespace otel_advisor_webApp.Controllers
             reservation.exp_2_rating = reservationDto.exp_2_rating;
             reservation.exp_3 = reservationDto.exp_3;
             reservation.exp_3_rating = reservationDto.exp_3_rating;
+            reservation.adult_num = reservationDto.adult_num;
+            reservation.child_num = reservationDto.child_num;
+            reservation.children_ages = reservationDto.children_ages; 
+            reservation.created_at = reservationDto.created_at; 
 
             _context.Entry(reservation).State = EntityState.Modified;
             await _context.SaveChangesAsync();

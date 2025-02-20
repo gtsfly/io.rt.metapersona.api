@@ -11,7 +11,7 @@ namespace otel_advisor_webApp.Models
         public string name { get; set; } = string.Empty;
         public string email { get; set; } = string.Empty;
 
-        public ICollection<ReservationRequest> Reservations { get; set; } = new List<ReservationRequest>();
+        public ICollection<ReservationRequest> ReservationRequests { get; set; } = new List<ReservationRequest>();
         public ICollection<UserPreference> UserPreferences { get; set; } = new List<UserPreference>();
     }
 }

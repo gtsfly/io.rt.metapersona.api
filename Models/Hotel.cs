@@ -17,6 +17,8 @@ namespace otel_advisor_webApp.Models
         public Location Location { get; set; }
 
         public ICollection<HotelExperience> HotelExperiences { get; set; } = new List<HotelExperience>();
-        public ICollection<ReservationRequest> Reservations { get; set; } = new List<ReservationRequest>();
+        public ICollection<ReservationRequest> ReservationRequests { get; set; } = new List<ReservationRequest>();
+        public ICollection<ReservationOffer> ReservationOffers { get; set; } = new List<ReservationOffer>();
+
     }
 }

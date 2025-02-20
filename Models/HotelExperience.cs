@@ -15,8 +15,10 @@ namespace otel_advisor_webApp.Models
 
         public int rating { get; set; }
 
+        [ForeignKey("hotel_id")]
         public Hotel hotel { get; set; }
+
+        [ForeignKey("experience_id")]
         public Experience experience { get; set; }
     }
 }
-    
