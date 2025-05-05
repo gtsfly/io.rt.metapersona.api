@@ -32,12 +32,27 @@ public class Startup
 
         services.AddScoped<ReservationConfirmedService>();
 
-        services.AddControllers();
+        // HttpClient and RecommendationService configuration for Python API
+        services.AddHttpClient();
+        services.AddScoped(sp =>
+        {
+            var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient();
+            var baseUrl = Configuration["PythonApi:BaseUrl"] ?? "http://localhost:8000";
+            var logger = sp.GetRequiredService<ILogger<RecommendationService>>();
+            return new RecommendationService(httpClient, baseUrl, logger);
+        });
+
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
 
         services.AddDbContext<HotelContext>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
-        // Swagger konfigürasyonu
+        // Swagger configuration
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
