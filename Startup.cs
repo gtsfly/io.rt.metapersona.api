@@ -70,15 +70,25 @@ public class Startup
                 });
         });
 
-        var emailConfig = Configuration.GetSection("EmailSettings");
-        services.AddSingleton(new SmtpClient(emailConfig["SmtpServer"])
+        // Email service configuration
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped(sp =>
         {
-            Port = int.Parse(emailConfig["SmtpPort"]),
-            Credentials = new NetworkCredential(emailConfig["SmtpUser"], emailConfig["SmtpPass"]),
-            EnableSsl = true
+            var emailSettings = Configuration.GetSection("EmailSettings");
+            var smtpClient = new SmtpClient
+            {
+                Host = emailSettings["SmtpServer"],
+                Port = int.Parse(emailSettings["SmtpPort"]),
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(
+                    emailSettings["SmtpUser"],
+                    emailSettings["SmtpPass"]
+                ),
+                DeliveryMethod = SmtpDeliveryMethod.Network
+            };
+            return smtpClient;
         });
-
-        services.AddTransient<IEmailService, EmailService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -93,9 +103,6 @@ public class Startup
         app.UseCors("AllowAllOrigins");
 
         app.UseRouting();
-
-        // Use CORS policy
-        app.UseCors("AllowAllOrigins");
 
         app.UseAuthorization();
 
